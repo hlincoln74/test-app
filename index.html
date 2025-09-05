@@ -1,0 +1,528 @@
+import React, { useState, useEffect } from 'react';
+
+const ChaseApp = () => {
+  const [currentView, setCurrentView] = useState('main');
+  const [currentAccount, setCurrentAccount] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editValue, setEditValue] = useState('');
+  const [currentTime, setCurrentTime] = useState('2:46');
+
+  const [accounts, setAccounts] = useState({
+    college: {
+      name: 'CHASE COLLEGE (...9238)',
+      balance: 83.49,
+      transactions: [
+        { description: 'ATM Withdrawal', amount: -20.00, date: '09/02', number: '26043399541', balance: 83.49 },
+        { description: 'Mobile Deposit', amount: 50.00, date: '09/01', number: '26043399540', balance: 53.49 },
+        { description: 'Dining Purchase', amount: -15.75, date: '08/31', number: '26043399539', balance: 3.49 }
+      ]
+    },
+    checking: {
+      name: 'TOTAL CHECKING (...2107)',
+      balance: 515.39,
+      transactions: [
+        { description: 'Direct Deposit - Payroll', amount: 1200.00, date: '09/01', number: '26043399545', balance: 515.39 },
+        { description: 'Auto Payment - Car Loan', amount: -350.00, date: '09/01', number: '26043399544', balance: -684.61 },
+        { description: 'Online Transfer to SAV', amount: -500.00, date: '08/30', number: '26043399542', balance: -334.61 }
+      ]
+    },
+    savings: {
+      name: 'CHASE SAVINGS (...8004)',
+      balance: 4070.01,
+      transactions: [
+        { description: 'Online Transfer to CHK ...9238', amount: -700.00, date: '09/02', number: '26043399543', balance: 4070.01 },
+        { description: 'Online Transfer to CHK ...9238', amount: -2200.00, date: '09/01', number: '26027218082', balance: 4770.01 },
+        { description: 'Interest Payment', amount: 15.50, date: '09/01', number: '26027218081', balance: 6970.01 },
+        { description: 'Online Transfer from CHK', amount: 500.00, date: '08/30', number: '26027218080', balance: 6954.51 }
+      ]
+    },
+    credit: {
+      name: 'Freedom Unlimited (...6628)',
+      balance: -266.01,
+      transactions: [
+        { description: 'Payment Thank You', amount: 300.00, date: '09/01', number: '26043399547', balance: -266.01 },
+        { description: 'Amazon Purchase', amount: -89.99, date: '08/31', number: '26043399546', balance: -566.01 },
+        { description: 'Gas Station', amount: -45.20, date: '08/30', number: '26043399545', balance: -476.02 }
+      ]
+    }
+  });
+
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      const time = now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
+      setCurrentTime(time);
+    };
+    
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const formatMoney = (amount) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    }).format(Math.abs(amount));
+  };
+
+  const openDetail = (accountType) => {
+    setCurrentAccount(accountType);
+    setCurrentView('detail');
+  };
+
+  const closeDetail = () => {
+    setCurrentView('main');
+    setCurrentAccount(null);
+  };
+
+  const editBalance = () => {
+    setEditValue(accounts[currentAccount].balance.toFixed(2));
+    setShowEditModal(true);
+  };
+
+  const saveBalance = () => {
+    const newBalance = parseFloat(editValue);
+    if (!isNaN(newBalance)) {
+      setAccounts(prev => ({
+        ...prev,
+        [currentAccount]: {
+          ...prev[currentAccount],
+          balance: newBalance
+        }
+      }));
+    }
+    setShowEditModal(false);
+  };
+
+  const MessageIcon = () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+    </svg>
+  );
+
+  const CalendarIcon = () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-7"/>
+      <path d="M3 8h18"/>
+      <path d="M8 3v5"/>
+      <path d="M16 3v5"/>
+    </svg>
+  );
+
+  const UserIcon = () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+      <circle cx="12" cy="7" r="4"/>
+    </svg>
+  );
+
+  const PlusIcon = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <line x1="12" y1="5" x2="12" y2="19"/>
+      <line x1="5" y1="12" x2="19" y2="12"/>
+    </svg>
+  );
+
+  const SendIcon = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <line x1="7" y1="17" x2="17" y2="7"/>
+      <polyline points="7,7 17,7 17,17"/>
+    </svg>
+  );
+
+  const DocumentIcon = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+      <polyline points="14,2 14,8 20,8"/>
+      <line x1="16" y1="13" x2="8" y2="13"/>
+      <line x1="16" y1="17" x2="8" y2="17"/>
+      <polyline points="10,9 9,9 8,9"/>
+    </svg>
+  );
+
+  const CardIcon = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+      <line x1="1" y1="10" x2="23" y2="10"/>
+    </svg>
+  );
+
+  const ChevronIcon = () => (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#c7c7cc" strokeWidth="2">
+      <polyline points="9,18 15,12 9,6"/>
+    </svg>
+  );
+
+  const EditIcon = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+    </svg>
+  );
+
+  const BackIcon = () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0066b2" strokeWidth="2">
+      <polyline points="15,18 9,12 15,6"/>
+    </svg>
+  );
+
+  const TransferIcon = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <polyline points="17,1 21,5 17,9"/>
+      <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+      <polyline points="7,23 3,19 7,15"/>
+      <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+    </svg>
+  );
+
+  const MoreIcon = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <circle cx="12" cy="12" r="1"/>
+      <circle cx="19" cy="12" r="1"/>
+      <circle cx="5" cy="12" r="1"/>
+    </svg>
+  );
+
+  const HelpIcon = () => (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#0066b2" strokeWidth="2">
+      <circle cx="12" cy="12" r="10"/>
+      <path d="M9,9a3,3 0 1,1 6,0c0,2 -3,3 -3,3"/>
+      <line x1="12" y1="17" x2="12.01" y2="17"/>
+    </svg>
+  );
+
+  if (currentView === 'detail' && currentAccount) {
+    const account = accounts[currentAccount];
+    
+    return (
+      <div className="min-h-screen bg-gray-100 max-w-sm mx-auto relative overflow-hidden">
+        {/* Status Bar */}
+        <div className="h-11 bg-gray-100 flex justify-between items-center px-5 text-lg font-semibold">
+          <div>{currentTime}</div>
+          <div className="flex items-center gap-1 text-sm">
+            <span>••</span>
+            <span>📶</span>
+            <span>📶</span>
+            <div className="w-7 h-3 border border-black rounded-sm bg-black text-white flex items-center justify-center text-xs font-bold relative">
+              72
+              <div className="absolute -right-1 top-1 w-0.5 h-2 bg-black rounded-r"></div>
+            </div>
+          </div>
+        </div>
+
+        {/* Detail Content */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="bg-gray-100 pt-15 pb-8 px-5">
+            <button 
+              onClick={closeDetail}
+              className="text-blue-600 text-lg mb-5 flex items-center gap-2"
+            >
+              <BackIcon />
+              Back
+            </button>
+            
+            <div className="text-xl font-semibold text-center mb-8">
+              {account.name}
+            </div>
+            
+            <div className="text-center mb-8">
+              <div className="text-4xl font-bold mb-2 flex items-center justify-center gap-3">
+                <span>{formatMoney(account.balance)}</span>
+                <button 
+                  onClick={editBalance}
+                  className="text-blue-600 bg-transparent border-none p-1"
+                >
+                  <EditIcon />
+                </button>
+              </div>
+              <div className="text-gray-500 text-lg">Available balance</div>
+            </div>
+
+            <div className="bg-white mx-5 mb-5 rounded-xl p-5 shadow-sm">
+              <div className="text-lg font-semibold mb-4">Account details</div>
+              <div className="flex justify-between items-center mb-3">
+                <div>Available balance</div>
+                <div className="flex items-center gap-2">
+                  <span>{formatMoney(account.balance)}</span>
+                  <HelpIcon />
+                </div>
+              </div>
+              <div className="flex justify-between items-center">
+                <div>Present balance</div>
+                <div className="flex items-center gap-2">
+                  <span>{formatMoney(account.balance)}</span>
+                  <HelpIcon />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-center gap-15 my-8">
+              <div className="flex flex-col items-center">
+                <div className="w-12 h-12 bg-gray-100 border border-gray-300 rounded-lg flex items-center justify-center text-blue-600 mb-2">
+                  <TransferIcon />
+                </div>
+                <div className="text-blue-600 text-sm">Transfer</div>
+              </div>
+              <div className="flex flex-col items-center">
+                <div className="w-12 h-12 bg-gray-100 border border-gray-300 rounded-lg flex items-center justify-center text-blue-600 mb-2">
+                  <MoreIcon />
+                </div>
+                <div className="text-blue-600 text-sm">More</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mx-5 mb-8">
+            <div className="bg-white rounded-t-xl border-b border-gray-100 p-5 shadow-sm">
+              <h3 className="text-lg font-semibold">See all transactions</h3>
+            </div>
+            <div className="bg-white rounded-b-xl max-h-96 overflow-y-auto">
+              {account.transactions.map((tx, index) => (
+                <div key={index} className="p-4 border-b border-gray-100 last:border-b-0">
+                  <div className="flex justify-between mb-2">
+                    <div className="flex-1 mr-4">
+                      <div className="text-base mb-1">{tx.description}</div>
+                      <div className="text-xs text-gray-500 leading-tight">
+                        transaction#: {tx.number} {tx.date}<br />
+                        Sep 02, 2025
+                      </div>
+                    </div>
+                    <div className={`text-base font-semibold ${tx.amount >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                      {tx.amount >= 0 ? `+${formatMoney(tx.amount)}` : `-${formatMoney(Math.abs(tx.amount))}`}
+                    </div>
+                  </div>
+                  <div className="text-xs text-gray-500">{formatMoney(tx.balance)}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Edit Modal */}
+        {showEditModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-5 z-50">
+            <div className="bg-white rounded-xl p-5 w-full max-w-xs text-center">
+              <h3 className="text-lg mb-5">Edit Balance</h3>
+              <input
+                type="number"
+                value={editValue}
+                onChange={(e) => setEditValue(e.target.value)}
+                placeholder="Enter new balance"
+                step="0.01"
+                className="w-full p-3 border border-gray-300 rounded-lg text-base mb-5"
+              />
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowEditModal(false)}
+                  className="flex-1 p-3 bg-gray-100 text-black rounded-lg text-base"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={saveBalance}
+                  className="flex-1 p-3 bg-blue-600 text-white rounded-lg text-base"
+                >
+                  Save
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-100 max-w-sm mx-auto flex flex-col">
+      {/* Status Bar */}
+      <div className="h-11 bg-gray-100 flex justify-between items-center px-5 text-lg font-semibold">
+        <div>{currentTime}</div>
+        <div className="flex items-center gap-1 text-sm">
+          <span>••</span>
+          <span>📶</span>
+          <span>📶</span>
+          <div className="w-7 h-3 border border-black rounded-sm bg-black text-white flex items-center justify-center text-xs font-bold relative">
+            72
+            <div className="absolute -right-1 top-1 w-0.5 h-2 bg-black rounded-r"></div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 overflow-y-auto">
+        {/* Top Navigation */}
+        <div className="flex justify-between items-center p-4">
+          <div className="flex gap-4 text-gray-500">
+            <MessageIcon />
+            <CalendarIcon />
+          </div>
+          <div className="w-8 h-8 text-white flex items-center justify-center border-radius-1 font-bold" style={{background: 'linear-gradient(to right, #012F6D, #034490)'}}>
+            ■
+          </div>
+          <div className="text-gray-500">
+            <UserIcon />
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="flex gap-4 px-5 pb-5 overflow-x-auto">
+          <div className="flex flex-col items-center min-w-fit">
+            <div className="w-12 h-12 bg-gray-100 border border-gray-300 rounded-lg flex items-center justify-center text-blue-600 mb-1">
+              <PlusIcon />
+            </div>
+          </div>
+          <div className="flex flex-col items-center min-w-fit">
+            <div className="w-12 h-12 bg-gray-100 border border-gray-300 rounded-lg flex items-center justify-center text-blue-600 mb-1">
+              <SendIcon />
+            </div>
+            <div className="text-xs text-blue-600 text-center">Send | Zelle®</div>
+          </div>
+          <div className="flex flex-col items-center min-w-fit">
+            <div className="w-12 h-12 bg-gray-100 border border-gray-300 rounded-lg flex items-center justify-center text-blue-600 mb-1">
+              <DocumentIcon />
+            </div>
+            <div className="text-xs text-blue-600 text-center">Deposit checks</div>
+          </div>
+          <div className="flex flex-col items-center min-w-fit">
+            <div className="w-12 h-12 bg-gray-100 border border-gray-300 rounded-lg flex items-center justify-center text-blue-600 mb-1">
+              <CardIcon />
+            </div>
+            <div className="text-xs text-blue-600 text-center">Pay bills</div>
+          </div>
+        </div>
+
+        {/* Accounts Section */}
+        <div className="px-5">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-semibold">Accounts</h2>
+            <MoreIcon />
+          </div>
+
+          {/* Bank Accounts */}
+          <div className="mb-5 rounded-xl overflow-hidden shadow-sm">
+            <div className="bg-blue-600 text-white p-4 font-medium">
+              Bank accounts (3)
+            </div>
+            
+            <button
+              onClick={() => openDetail('college')}
+              className="w-full bg-white border-b border-gray-100 p-5 flex justify-between items-center text-left"
+            >
+              <div className="flex-1">
+                <div className="text-base mb-1">CHASE COLLEGE (...9238)</div>
+              </div>
+              <div className="text-right">
+                <div className="text-lg font-semibold mb-0.5">{formatMoney(accounts.college.balance)}</div>
+                <div className="text-xs text-gray-500">Available balance</div>
+              </div>
+              <div className="ml-2">
+                <ChevronIcon />
+              </div>
+            </button>
+
+            <button
+              onClick={() => openDetail('checking')}
+              className="w-full bg-white border-b border-gray-100 p-5 flex justify-between items-center text-left"
+            >
+              <div className="flex-1">
+                <div className="text-base mb-1">TOTAL CHECKING (...2107)</div>
+              </div>
+              <div className="text-right">
+                <div className="text-lg font-semibold mb-0.5">{formatMoney(accounts.checking.balance)}</div>
+                <div className="text-xs text-gray-500">Available balance</div>
+              </div>
+              <div className="ml-2">
+                <ChevronIcon />
+              </div>
+            </button>
+
+            <button
+              onClick={() => openDetail('savings')}
+              className="w-full bg-white p-5 flex justify-between items-center text-left"
+            >
+              <div className="flex-1">
+                <div className="text-base mb-1">CHASE SAVINGS (...8004)</div>
+              </div>
+              <div className="text-right">
+                <div className="text-lg font-semibold mb-0.5">{formatMoney(accounts.savings.balance)}</div>
+                <div className="text-xs text-gray-500">Available balance</div>
+              </div>
+              <div className="ml-2">
+                <ChevronIcon />
+              </div>
+            </button>
+          </div>
+
+          {/* Credit Cards */}
+          <div className="mb-5 rounded-xl overflow-hidden shadow-sm">
+            <div className="bg-blue-600 text-white p-4 font-medium">
+              Credit cards (1)
+            </div>
+            
+            <button
+              onClick={() => openDetail('credit')}
+              className="w-full bg-white p-5 flex justify-between items-center text-left"
+            >
+              <div className="flex-1">
+                <div className="text-base mb-1">Freedom Unlimited (...6628)</div>
+                <div className="w-10 h-6 rounded mt-1 flex items-center justify-center text-white text-xs font-bold" style={{background: 'linear-gradient(to right, #012F6D, #034490)'}}>
+                  FREEDOM
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-lg font-semibold mb-0.5">{formatMoney(accounts.credit.balance)}</div>
+                <div className="text-xs text-gray-500">Available balance</div>
+              </div>
+              <div className="ml-2">
+                <ChevronIcon />
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom Navigation */}
+      <div className="flex justify-around p-2 pt-2 pb-8 bg-gray-100 border-t border-gray-300">
+        <div className="flex flex-col items-center gap-1 flex-1 text-blue-600">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9,22 9,12 15,12 15,22"/>
+          </svg>
+          <div className="text-xs">Accounts</div>
+        </div>
+        <div className="flex flex-col items-center gap-1 flex-1 text-gray-500">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <line x1="12" y1="1" x2="12" y2="23"/>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+          <div className="text-xs">Pay & transfer</div>
+        </div>
+        <div className="flex flex-col items-center gap-1 flex-1 text-gray-500">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <line x1="18" y1="20" x2="18" y2="10"/>
+            <line x1="12" y1="20" x2="12" y2="4"/>
+            <line x1="6" y1="20" x2="6" y2="14"/>
+          </svg>
+          <div className="text-xs">Plan & track</div>
+        </div>
+        <div className="flex flex-col items-center gap-1 flex-1 text-gray-500">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+          </svg>
+          <div className="text-xs">Benefits & travel</div>
+        </div>
+        <div className="flex flex-col items-center gap-1 flex-1 text-gray-500">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <line x1="3" y1="12" x2="21" y2="12"/>
+            <line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+          <div className="text-xs">More</div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ChaseApp;
