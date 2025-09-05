@@ -284,9 +284,9 @@
 
         function renderMainView() {
             return `
-                <div class="min-h-screen bg-gray-100 max-w-sm mx-auto flex flex-col">
+                <div class="bg-gray-100 flex flex-col" style="height: 100vh; max-width: 393px; margin: 0 auto;">
                     <!-- Blue Status Bar Area -->
-                    <div class="h-11 flex items-center justify-center" style="background: linear-gradient(to right, #012F6D, #034490);"></div>
+                    <div class="status-bar-height flex items-center justify-center" style="background: linear-gradient(to right, #012F6D, #034490);"></div>
                     
                     <!-- Main Content -->
                     <div class="flex-1 overflow-y-auto">
@@ -307,12 +307,12 @@
                             </div>
 
                             <!-- All Accounts Combined -->
-                            <div class="mb-5 rounded-xl overflow-hidden shadow-sm">
+                            <div class="mb-5 iphone-rounded-lg overflow-hidden iphone-shadow">
                                 <div class="text-white p-4 font-medium" style="background: linear-gradient(to right, #012F6D, #034490);">
                                     Bank accounts (3)
                                 </div>
                                 
-                                <button onclick="openDetail('college')" class="w-full bg-white border-b border-gray-100 p-5 flex justify-between items-center text-left">
+                                <button onclick="openDetail('college')" class="w-full bg-white account-border border-gray-100 p-5 flex justify-between items-center text-left">
                                     <div class="flex-1">
                                         <div class="text-base">CHASE COLLEGE (...9238)</div>
                                     </div>
@@ -320,12 +320,12 @@
                                         <div class="text-2xl font-semibold text-black mb-1">${formatMoney(state.accounts.college.balance)}</div>
                                         <div class="text-xs text-gray-500">Available balance</div>
                                     </div>
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#c7c7cc" stroke-width="2">
-                                        <polyline points="9,18 15,12 9,6"/>
+                                    <svg width="8" height="13" viewBox="0 0 8 13" fill="none">
+                                        <path d="M1 1L6.5 6.5L1 12" stroke="#C7C7CC" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                                     </svg>
                                 </button>
 
-                                <button onclick="openDetail('checking')" class="w-full bg-white border-b border-gray-100 p-5 flex justify-between items-center text-left">
+                                <button onclick="openDetail('checking')" class="w-full bg-white account-border border-gray-100 p-5 flex justify-between items-center text-left">
                                     <div class="flex-1">
                                         <div class="text-base">TOTAL CHECKING (...2107)</div>
                                     </div>
@@ -333,12 +333,12 @@
                                         <div class="text-2xl font-semibold text-black mb-1">${formatMoney(state.accounts.checking.balance)}</div>
                                         <div class="text-xs text-gray-500">Available balance</div>
                                     </div>
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#c7c7cc" stroke-width="2">
-                                        <polyline points="9,18 15,12 9,6"/>
+                                    <svg width="8" height="13" viewBox="0 0 8 13" fill="none">
+                                        <path d="M1 1L6.5 6.5L1 12" stroke="#C7C7CC" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                                     </svg>
                                 </button>
 
-                                <button onclick="openDetail('savings')" class="w-full bg-white border-b border-gray-100 p-5 flex justify-between items-center text-left">
+                                <button onclick="openDetail('savings')" class="w-full bg-white account-border border-gray-100 p-5 flex justify-between items-center text-left">
                                     <div class="flex-1">
                                         <div class="text-base">CHASE SAVINGS (...8004)</div>
                                     </div>
@@ -346,8 +346,8 @@
                                         <div class="text-2xl font-semibold text-black mb-1">${formatMoney(state.accounts.savings.balance)}</div>
                                         <div class="text-xs text-gray-500">Available balance</div>
                                     </div>
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#c7c7cc" stroke-width="2">
-                                        <polyline points="9,18 15,12 9,6"/>
+                                    <svg width="8" height="13" viewBox="0 0 8 13" fill="none">
+                                        <path d="M1 1L6.5 6.5L1 12" stroke="#C7C7CC" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                                     </svg>
                                 </button>
 
@@ -358,16 +358,19 @@
                                 <button onclick="openDetail('credit')" class="w-full bg-white p-5 flex justify-between items-center text-left">
                                     <div class="flex-1">
                                         <div class="text-base mb-2">Freedom Unlimited (...6628)</div>
-                                        <div class="w-10 h-6 rounded mt-1 flex items-center justify-center text-white text-xs font-bold" style="background: linear-gradient(to right, #012F6D, #034490);">
-                                            FREEDOM
+                                        <div class="w-14 h-8 iphone-rounded flex items-center justify-center text-white text-xs font-bold" style="background: linear-gradient(to right, #012F6D, #034490);">
+                                            <div class="w-3 h-3 bg-white rounded-full mr-1 flex items-center justify-center">
+                                                <div class="text-xs text-blue-600 font-bold">○</div>
+                                            </div>
+                                            freedom
                                         </div>
                                     </div>
                                     <div class="text-right mr-3">
                                         <div class="text-2xl font-semibold text-black mb-1">${formatMoney(state.accounts.credit.balance)}</div>
                                         <div class="text-xs text-gray-500">Available balance</div>
                                     </div>
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#c7c7cc" stroke-width="2">
-                                        <polyline points="9,18 15,12 9,6"/>
+                                    <svg width="8" height="13" viewBox="0 0 8 13" fill="none">
+                                        <path d="M1 1L6.5 6.5L1 12" stroke="#C7C7CC" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                                     </svg>
                                 </button>
                             </div>
@@ -375,26 +378,24 @@
                     </div>
 
                     <!-- Bottom Navigation -->
-                    <div class="flex bg-gray-100 border-t border-gray-300" style="padding: 8px 0; padding-bottom: env(safe-area-inset-bottom, 8px);">
+                    <div class="flex bg-gray-100 border-t account-border border-gray-300 bottom-safe-area" style="padding: 8px 0; padding-bottom: var(--safe-area-bottom, 34px);">
                         <div class="flex flex-col items-center gap-1 flex-1 text-blue-600">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                                <polyline points="9,22 9,12 15,12 15,22"/>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
                             </svg>
                             <div class="text-xs">Accounts</div>
                         </div>
                         <div class="flex flex-col items-center gap-1 flex-1 text-gray-500">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="12" y1="1" x2="12" y2="23"/>
-                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                                <circle cx="12" cy="12" r="3"/>
+                                <path d="M12 1v6m0 6v6"/>
                             </svg>
                             <div class="text-xs">Pay & transfer</div>
                         </div>
                         <div class="flex flex-col items-center gap-1 flex-1 text-gray-500">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="18" y1="20" x2="18" y2="10"/>
-                                <line x1="12" y1="20" x2="12" y2="4"/>
-                                <line x1="6" y1="20" x2="6" y2="14"/>
+                                <path d="M3 3v5h5M21 21v-5h-5"/>
+                                <path d="M21 3a16 16 0 0 0-13 13m0 0a16 16 0 0 0 13 13"/>
                             </svg>
                             <div class="text-xs">Plan & track</div>
                         </div>
