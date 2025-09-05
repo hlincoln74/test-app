@@ -1,528 +1,535 @@
-import React, { useState, useEffect } from 'react';
-
-const ChaseApp = () => {
-  const [currentView, setCurrentView] = useState('main');
-  const [currentAccount, setCurrentAccount] = useState(null);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [editValue, setEditValue] = useState('');
-  const [currentTime, setCurrentTime] = useState('2:46');
-
-  const [accounts, setAccounts] = useState({
-    college: {
-      name: 'CHASE COLLEGE (...9238)',
-      balance: 83.49,
-      transactions: [
-        { description: 'ATM Withdrawal', amount: -20.00, date: '09/02', number: '26043399541', balance: 83.49 },
-        { description: 'Mobile Deposit', amount: 50.00, date: '09/01', number: '26043399540', balance: 53.49 },
-        { description: 'Dining Purchase', amount: -15.75, date: '08/31', number: '26043399539', balance: 3.49 }
-      ]
-    },
-    checking: {
-      name: 'TOTAL CHECKING (...2107)',
-      balance: 515.39,
-      transactions: [
-        { description: 'Direct Deposit - Payroll', amount: 1200.00, date: '09/01', number: '26043399545', balance: 515.39 },
-        { description: 'Auto Payment - Car Loan', amount: -350.00, date: '09/01', number: '26043399544', balance: -684.61 },
-        { description: 'Online Transfer to SAV', amount: -500.00, date: '08/30', number: '26043399542', balance: -334.61 }
-      ]
-    },
-    savings: {
-      name: 'CHASE SAVINGS (...8004)',
-      balance: 4070.01,
-      transactions: [
-        { description: 'Online Transfer to CHK ...9238', amount: -700.00, date: '09/02', number: '26043399543', balance: 4070.01 },
-        { description: 'Online Transfer to CHK ...9238', amount: -2200.00, date: '09/01', number: '26027218082', balance: 4770.01 },
-        { description: 'Interest Payment', amount: 15.50, date: '09/01', number: '26027218081', balance: 6970.01 },
-        { description: 'Online Transfer from CHK', amount: 500.00, date: '08/30', number: '26027218080', balance: 6954.51 }
-      ]
-    },
-    credit: {
-      name: 'Freedom Unlimited (...6628)',
-      balance: -266.01,
-      transactions: [
-        { description: 'Payment Thank You', amount: 300.00, date: '09/01', number: '26043399547', balance: -266.01 },
-        { description: 'Amazon Purchase', amount: -89.99, date: '08/31', number: '26043399546', balance: -566.01 },
-        { description: 'Gas Station', amount: -45.20, date: '08/30', number: '26043399545', balance: -476.02 }
-      ]
-    }
-  });
-
-  useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      const time = now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
-      setCurrentTime(time);
-    };
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Chase Mobile</title>
     
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const formatMoney = (amount) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(Math.abs(amount));
-  };
-
-  const openDetail = (accountType) => {
-    setCurrentAccount(accountType);
-    setCurrentView('detail');
-  };
-
-  const closeDetail = () => {
-    setCurrentView('main');
-    setCurrentAccount(null);
-  };
-
-  const editBalance = () => {
-    setEditValue(accounts[currentAccount].balance.toFixed(2));
-    setShowEditModal(true);
-  };
-
-  const saveBalance = () => {
-    const newBalance = parseFloat(editValue);
-    if (!isNaN(newBalance)) {
-      setAccounts(prev => ({
-        ...prev,
-        [currentAccount]: {
-          ...prev[currentAccount],
-          balance: newBalance
+    <!-- PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Chase">
+    <meta name="theme-color" content="#012F6D">
+    
+    <!-- Icon for home screen -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDE4MCAxODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxkZWZzPgo8bGluZWFyR3JhZGllbnQgaWQ9ImNoYXNlR3JhZGllbnQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjAlIj4KPHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6IzAxMkY2RCIgLz4KPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdHlsZT0ic3RvcC1jb2xvcjojMDM0NDkwIiAvPgo8L2xpbmVhckdyYWRpZW50Pgo8L2RlZnM+CjxyZWN0IHdpZHRoPSIxODAiIGhlaWdodD0iMTgwIiBmaWxsPSJ1cmwoI2NoYXNlR3JhZGllbnQpIi8+Cjx0ZXh0IHg9IjkwIiB5PSI5NSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjM2IiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC13ZWlnaHQ9ImJvbGQiPkNIQVNFPC90ZXh0Pgo8L3N2Zz4=">
+    
+    <!-- Manifest for PWA -->
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiQ2hhc2UgTW9iaWxlIiwic2hvcnRfbmFtZSI6IkNoYXNlIiwic3RhcnRfdXJsIjoiLyIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiMwMTJGNkQiLCJ0aGVtZV9jb2xvciI6IiMwMTJGNkQiLCJpY29ucyI6W3sic3JjIjoiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCM2FXUjBhRDBpTVRnd0lpQm9aV2xuYUhROUlqRTRNQ0lpSUhacFpYZENiM2c5SWpBZ01DQXhPREFnTVRnd0lpQm1hV3hzUFNKdWIyNWxJaUI0Yld4dWN6MGlhSFIwY0RvdkwzZDNkeTUzTXk1dmNtY3ZNakF3TUM5emRtY2lQZ285WkdWbWN6NGdhV1E5SW1Ob1lYTmxSM0poWkdsbGJuUWlJSGd4UFNJd0pTSWdlVEU5SWpBbElpQjRNajBpTVRBd0pTSWdlVEk5SWpBbElqNGdQSE4wYjNBZ2IyWm1jMlYwUFNJd0pTSWdjM1I1YkdVOUluTjBiM0F0WTI5c2IzSTZJekF4TWtZMlJDSWdMejRnUEhOMGIzQWdiMlptYzJWMFBTSXhNREFsSWlCemRIbHNaVDBpYzNSdmNDMWpiMnh2Y2pvaU1ETTBORGt3SWlBdlBnbzhMMnhwYm1WaGNrZHlZV1JwWlc1MFBnbzhMMlJsWm5NK0NqeHlaV04wSUhkcFpIUm9QU0l4T0RBaUlHaGxhV2RvZEQwaU1UZ3dJaUJtYVd4c1BTSjFjbXdvSTJOb1lYTmxSM0poWkdsbGJuUXBJaTgrQ2p4MFpYaDBJSGc5SWpreElpQjVQU0k1TlNJZ1ptOXVkQzFtWVcxcGJIazlJa0Z5YVdGc0xDQnpZVzV6TFhObGNtbG1JaUJtYjI1MExYTnBlbVU5SWpNMklpQm1hV3hzUFNKM2FHbDBaU0lnZEdWNGRDMWhibU5vYjNJOUltMXBaR1JzWlNJZ1ptOXVkQzEzWldsbmFIUTlJbUp2YkdRaVBrTklRVk5GUEM5MFpYaDBQZ284TDNOMlp6ND0iLCJzaXplcyI6IjE4MHgxODAiLCJ0eXBlIjoiaW1hZ2Uvc3ZnK3htbCJ9XX0=">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
         }
-      }));
-    }
-    setShowEditModal(false);
-  };
+        
+        /* Prevent zoom on input focus */
+        input[type="number"] {
+            font-size: 16px;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+        
+        /* Prevent bounce scrolling */
+        html, body {
+            overflow-x: hidden;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+        }
+        
+        #app {
+            overflow-y: auto;
+            height: 100vh;
+            -webkit-overflow-scrolling: touch;
+        }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
 
-  const MessageIcon = () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-    </svg>
-  );
+    <script>
+        // React-like state management and rendering
+        let state = {
+            currentView: 'main',
+            currentAccount: null,
+            showEditModal: false,
+            editValue: '',
+            currentTime: '2:46',
+            accounts: {
+                college: {
+                    name: 'CHASE COLLEGE (...9238)',
+                    balance: 83.49,
+                    transactions: [
+                        { description: 'ATM Withdrawal', amount: -20.00, date: '09/02', number: '26043399541', balance: 83.49 },
+                        { description: 'Mobile Deposit', amount: 50.00, date: '09/01', number: '26043399540', balance: 53.49 },
+                        { description: 'Dining Purchase', amount: -15.75, date: '08/31', number: '26043399539', balance: 3.49 }
+                    ]
+                },
+                checking: {
+                    name: 'TOTAL CHECKING (...2107)',
+                    balance: 515.39,
+                    transactions: [
+                        { description: 'Direct Deposit - Payroll', amount: 1200.00, date: '09/01', number: '26043399545', balance: 515.39 },
+                        { description: 'Auto Payment - Car Loan', amount: -350.00, date: '09/01', number: '26043399544', balance: -684.61 },
+                        { description: 'Online Transfer to SAV', amount: -500.00, date: '08/30', number: '26043399542', balance: -334.61 }
+                    ]
+                },
+                savings: {
+                    name: 'CHASE SAVINGS (...8004)',
+                    balance: 4070.01,
+                    transactions: [
+                        { description: 'Online Transfer to CHK ...9238', amount: -700.00, date: '09/02', number: '26043399543', balance: 4070.01 },
+                        { description: 'Online Transfer to CHK ...9238', amount: -2200.00, date: '09/01', number: '26027218082', balance: 4770.01 },
+                        { description: 'Interest Payment', amount: 15.50, date: '09/01', number: '26027218081', balance: 6970.01 },
+                        { description: 'Online Transfer from CHK', amount: 500.00, date: '08/30', number: '26027218080', balance: 6954.51 }
+                    ]
+                },
+                credit: {
+                    name: 'Freedom Unlimited (...6628)',
+                    balance: -266.01,
+                    transactions: [
+                        { description: 'Payment Thank You', amount: 300.00, date: '09/01', number: '26043399547', balance: -266.01 },
+                        { description: 'Amazon Purchase', amount: -89.99, date: '08/31', number: '26043399546', balance: -566.01 },
+                        { description: 'Gas Station', amount: -45.20, date: '08/30', number: '26043399545', balance: -476.02 }
+                    ]
+                }
+            }
+        };
 
-  const CalendarIcon = () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-7"/>
-      <path d="M3 8h18"/>
-      <path d="M8 3v5"/>
-      <path d="M16 3v5"/>
-    </svg>
-  );
+        function formatMoney(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD'
+            }).format(Math.abs(amount));
+        }
 
-  const UserIcon = () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-      <circle cx="12" cy="7" r="4"/>
-    </svg>
-  );
+        function updateTime() {
+            const now = new Date();
+            const time = now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
+            state.currentTime = time;
+            render();
+        }
 
-  const PlusIcon = () => (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <line x1="12" y1="5" x2="12" y2="19"/>
-      <line x1="5" y1="12" x2="19" y2="12"/>
-    </svg>
-  );
+        function openDetail(accountType) {
+            state.currentAccount = accountType;
+            state.currentView = 'detail';
+            render();
+        }
 
-  const SendIcon = () => (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <line x1="7" y1="17" x2="17" y2="7"/>
-      <polyline points="7,7 17,7 17,17"/>
-    </svg>
-  );
+        function closeDetail() {
+            state.currentView = 'main';
+            state.currentAccount = null;
+            render();
+        }
 
-  const DocumentIcon = () => (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-      <polyline points="14,2 14,8 20,8"/>
-      <line x1="16" y1="13" x2="8" y2="13"/>
-      <line x1="16" y1="17" x2="8" y2="17"/>
-      <polyline points="10,9 9,9 8,9"/>
-    </svg>
-  );
+        function editBalance() {
+            state.editValue = state.accounts[state.currentAccount].balance.toFixed(2);
+            state.showEditModal = true;
+            render();
+        }
 
-  const CardIcon = () => (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
-      <line x1="1" y1="10" x2="23" y2="10"/>
-    </svg>
-  );
+        function closeModal() {
+            state.showEditModal = false;
+            render();
+        }
 
-  const ChevronIcon = () => (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#c7c7cc" strokeWidth="2">
-      <polyline points="9,18 15,12 9,6"/>
-    </svg>
-  );
+        function saveBalance() {
+            const newBalance = parseFloat(state.editValue);
+            if (!isNaN(newBalance)) {
+                state.accounts[state.currentAccount].balance = newBalance;
+            }
+            state.showEditModal = false;
+            render();
+        }
 
-  const EditIcon = () => (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-    </svg>
-  );
+        function updateEditValue(value) {
+            state.editValue = value;
+        }
 
-  const BackIcon = () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0066b2" strokeWidth="2">
-      <polyline points="15,18 9,12 15,6"/>
-    </svg>
-  );
-
-  const TransferIcon = () => (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <polyline points="17,1 21,5 17,9"/>
-      <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
-      <polyline points="7,23 3,19 7,15"/>
-      <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
-    </svg>
-  );
-
-  const MoreIcon = () => (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <circle cx="12" cy="12" r="1"/>
-      <circle cx="19" cy="12" r="1"/>
-      <circle cx="5" cy="12" r="1"/>
-    </svg>
-  );
-
-  const HelpIcon = () => (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#0066b2" strokeWidth="2">
-      <circle cx="12" cy="12" r="10"/>
-      <path d="M9,9a3,3 0 1,1 6,0c0,2 -3,3 -3,3"/>
-      <line x1="12" y1="17" x2="12.01" y2="17"/>
-    </svg>
-  );
-
-  if (currentView === 'detail' && currentAccount) {
-    const account = accounts[currentAccount];
-    
-    return (
-      <div className="min-h-screen bg-gray-100 max-w-sm mx-auto relative overflow-hidden">
-        {/* Status Bar */}
-        <div className="h-11 bg-gray-100 flex justify-between items-center px-5 text-lg font-semibold">
-          <div>{currentTime}</div>
-          <div className="flex items-center gap-1 text-sm">
-            <span>••</span>
-            <span>📶</span>
-            <span>📶</span>
-            <div className="w-7 h-3 border border-black rounded-sm bg-black text-white flex items-center justify-center text-xs font-bold relative">
-              72
-              <div className="absolute -right-1 top-1 w-0.5 h-2 bg-black rounded-r"></div>
-            </div>
-          </div>
-        </div>
-
-        {/* Detail Content */}
-        <div className="flex-1 overflow-y-auto">
-          <div className="bg-gray-100 pt-15 pb-8 px-5">
-            <button 
-              onClick={closeDetail}
-              className="text-blue-600 text-lg mb-5 flex items-center gap-2"
-            >
-              <BackIcon />
-              Back
-            </button>
+        function renderDetailView() {
+            const account = state.accounts[state.currentAccount];
             
-            <div className="text-xl font-semibold text-center mb-8">
-              {account.name}
-            </div>
-            
-            <div className="text-center mb-8">
-              <div className="text-4xl font-bold mb-2 flex items-center justify-center gap-3">
-                <span>{formatMoney(account.balance)}</span>
-                <button 
-                  onClick={editBalance}
-                  className="text-blue-600 bg-transparent border-none p-1"
-                >
-                  <EditIcon />
-                </button>
-              </div>
-              <div className="text-gray-500 text-lg">Available balance</div>
-            </div>
-
-            <div className="bg-white mx-5 mb-5 rounded-xl p-5 shadow-sm">
-              <div className="text-lg font-semibold mb-4">Account details</div>
-              <div className="flex justify-between items-center mb-3">
-                <div>Available balance</div>
-                <div className="flex items-center gap-2">
-                  <span>{formatMoney(account.balance)}</span>
-                  <HelpIcon />
-                </div>
-              </div>
-              <div className="flex justify-between items-center">
-                <div>Present balance</div>
-                <div className="flex items-center gap-2">
-                  <span>{formatMoney(account.balance)}</span>
-                  <HelpIcon />
-                </div>
-              </div>
-            </div>
-
-            <div className="flex justify-center gap-15 my-8">
-              <div className="flex flex-col items-center">
-                <div className="w-12 h-12 bg-gray-100 border border-gray-300 rounded-lg flex items-center justify-center text-blue-600 mb-2">
-                  <TransferIcon />
-                </div>
-                <div className="text-blue-600 text-sm">Transfer</div>
-              </div>
-              <div className="flex flex-col items-center">
-                <div className="w-12 h-12 bg-gray-100 border border-gray-300 rounded-lg flex items-center justify-center text-blue-600 mb-2">
-                  <MoreIcon />
-                </div>
-                <div className="text-blue-600 text-sm">More</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="mx-5 mb-8">
-            <div className="bg-white rounded-t-xl border-b border-gray-100 p-5 shadow-sm">
-              <h3 className="text-lg font-semibold">See all transactions</h3>
-            </div>
-            <div className="bg-white rounded-b-xl max-h-96 overflow-y-auto">
-              {account.transactions.map((tx, index) => (
-                <div key={index} className="p-4 border-b border-gray-100 last:border-b-0">
-                  <div className="flex justify-between mb-2">
-                    <div className="flex-1 mr-4">
-                      <div className="text-base mb-1">{tx.description}</div>
-                      <div className="text-xs text-gray-500 leading-tight">
-                        transaction#: {tx.number} {tx.date}<br />
-                        Sep 02, 2025
-                      </div>
+            return `
+                <div class="min-h-screen bg-gray-100 max-w-sm mx-auto relative overflow-hidden">
+                    <!-- Status Bar -->
+                    <div class="h-11 bg-gray-100 flex justify-between items-center px-5 text-lg font-semibold">
+                        <div>${state.currentTime}</div>
+                        <div class="flex items-center gap-1 text-sm">
+                            <span>••</span>
+                            <span>📶</span>
+                            <span>📶</span>
+                            <div class="w-7 h-3 border border-black rounded-sm bg-black text-white flex items-center justify-center text-xs font-bold relative">
+                                72
+                                <div class="absolute -right-1 top-1 w-0.5 h-2 bg-black rounded-r"></div>
+                            </div>
+                        </div>
                     </div>
-                    <div className={`text-base font-semibold ${tx.amount >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                      {tx.amount >= 0 ? `+${formatMoney(tx.amount)}` : `-${formatMoney(Math.abs(tx.amount))}`}
+
+                    <!-- Detail Content -->
+                    <div class="flex-1 overflow-y-auto">
+                        <div class="bg-gray-100 pt-15 pb-8 px-5">
+                            <button onclick="closeDetail()" class="text-blue-600 text-lg mb-5 flex items-center gap-2">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0066b2" stroke-width="2">
+                                    <polyline points="15,18 9,12 15,6"/>
+                                </svg>
+                                Back
+                            </button>
+                            
+                            <div class="text-xl font-semibold text-center mb-8">
+                                ${account.name}
+                            </div>
+                            
+                            <div class="text-center mb-8">
+                                <div class="text-4xl font-bold mb-2 flex items-center justify-center gap-3">
+                                    <span>${formatMoney(account.balance)}</span>
+                                    <button onclick="editBalance()" class="text-blue-600 bg-transparent border-none p-1">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class="text-gray-500 text-lg">Available balance</div>
+                            </div>
+
+                            <div class="bg-white mx-5 mb-5 rounded-xl p-5 shadow-sm">
+                                <div class="text-lg font-semibold mb-4">Account details</div>
+                                <div class="flex justify-between items-center mb-3">
+                                    <div>Available balance</div>
+                                    <div class="flex items-center gap-2">
+                                        <span>${formatMoney(account.balance)}</span>
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#0066b2" stroke-width="2">
+                                            <circle cx="12" cy="12" r="10"/>
+                                            <path d="M9,9a3,3 0 1,1 6,0c0,2 -3,3 -3,3"/>
+                                            <line x1="12" y1="17" x2="12.01" y2="17"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <div>Present balance</div>
+                                    <div class="flex items-center gap-2">
+                                        <span>${formatMoney(account.balance)}</span>
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#0066b2" stroke-width="2">
+                                            <circle cx="12" cy="12" r="10"/>
+                                            <path d="M9,9a3,3 0 1,1 6,0c0,2 -3,3 -3,3"/>
+                                            <line x1="12" y1="17" x2="12.01" y2="17"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mx-5 mb-8">
+                            <div class="bg-white rounded-t-xl border-b border-gray-100 p-5 shadow-sm">
+                                <h3 class="text-lg font-semibold">See all transactions</h3>
+                            </div>
+                            <div class="bg-white rounded-b-xl max-h-96 overflow-y-auto">
+                                ${account.transactions.map((tx, index) => `
+                                    <div class="p-4 border-b border-gray-100 ${index === account.transactions.length - 1 ? 'border-b-0' : ''}">
+                                        <div class="flex justify-between mb-2">
+                                            <div class="flex-1 mr-4">
+                                                <div class="text-base mb-1">${tx.description}</div>
+                                                <div class="text-xs text-gray-500 leading-tight">
+                                                    transaction#: ${tx.number} ${tx.date}<br>
+                                                    Sep 02, 2025
+                                                </div>
+                                            </div>
+                                            <div class="text-base font-semibold ${tx.amount >= 0 ? 'text-green-500' : 'text-red-500'}">
+                                                ${tx.amount >= 0 ? '+' + formatMoney(tx.amount) : '-' + formatMoney(Math.abs(tx.amount))}
+                                            </div>
+                                        </div>
+                                        <div class="text-xs text-gray-500">${formatMoney(tx.balance)}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
                     </div>
-                  </div>
-                  <div className="text-xs text-gray-500">{formatMoney(tx.balance)}</div>
+
+                    <!-- Edit Modal -->
+                    ${state.showEditModal ? `
+                        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-5 z-50">
+                            <div class="bg-white rounded-xl p-5 w-full max-w-xs text-center">
+                                <h3 class="text-lg mb-5">Edit Balance</h3>
+                                <input
+                                    type="number"
+                                    value="${state.editValue}"
+                                    oninput="updateEditValue(this.value)"
+                                    placeholder="Enter new balance"
+                                    step="0.01"
+                                    class="w-full p-3 border border-gray-300 rounded-lg text-base mb-5"
+                                />
+                                <div class="flex gap-2">
+                                    <button onclick="closeModal()" class="flex-1 p-3 bg-gray-100 text-black rounded-lg text-base">
+                                        Cancel
+                                    </button>
+                                    <button onclick="saveBalance()" class="flex-1 p-3 bg-blue-600 text-white rounded-lg text-base">
+                                        Save
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    ` : ''}
                 </div>
-              ))}
-            </div>
-          </div>
-        </div>
+            `;
+        }
 
-        {/* Edit Modal */}
-        {showEditModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-5 z-50">
-            <div className="bg-white rounded-xl p-5 w-full max-w-xs text-center">
-              <h3 className="text-lg mb-5">Edit Balance</h3>
-              <input
-                type="number"
-                value={editValue}
-                onChange={(e) => setEditValue(e.target.value)}
-                placeholder="Enter new balance"
-                step="0.01"
-                className="w-full p-3 border border-gray-300 rounded-lg text-base mb-5"
-              />
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setShowEditModal(false)}
-                  className="flex-1 p-3 bg-gray-100 text-black rounded-lg text-base"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={saveBalance}
-                  className="flex-1 p-3 bg-blue-600 text-white rounded-lg text-base"
-                >
-                  Save
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  }
+        function renderMainView() {
+            return `
+                <div class="min-h-screen bg-gray-100 max-w-sm mx-auto flex flex-col">
+                    <!-- Status Bar -->
+                    <div class="h-11 bg-gray-100 flex justify-between items-center px-5 text-lg font-semibold">
+                        <div>${state.currentTime}</div>
+                        <div class="flex items-center gap-1 text-sm">
+                            <span>••</span>
+                            <span>📶</span>
+                            <span>📶</span>
+                            <div class="w-7 h-3 border border-black rounded-sm bg-black text-white flex items-center justify-center text-xs font-bold relative">
+                                72
+                                <div class="absolute -right-1 top-1 w-0.5 h-2 bg-black rounded-r"></div>
+                            </div>
+                        </div>
+                    </div>
 
-  return (
-    <div className="min-h-screen bg-gray-100 max-w-sm mx-auto flex flex-col">
-      {/* Status Bar */}
-      <div className="h-11 bg-gray-100 flex justify-between items-center px-5 text-lg font-semibold">
-        <div>{currentTime}</div>
-        <div className="flex items-center gap-1 text-sm">
-          <span>••</span>
-          <span>📶</span>
-          <span>📶</span>
-          <div className="w-7 h-3 border border-black rounded-sm bg-black text-white flex items-center justify-center text-xs font-bold relative">
-            72
-            <div className="absolute -right-1 top-1 w-0.5 h-2 bg-black rounded-r"></div>
-          </div>
-        </div>
-      </div>
+                    <!-- Main Content -->
+                    <div class="flex-1 overflow-y-auto">
+                        <!-- Top Navigation -->
+                        <div class="flex justify-between items-center p-4">
+                            <div class="flex gap-4 text-gray-500">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                                </svg>
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                    <path d="M3 8h18"/>
+                                    <path d="M8 3v5"/>
+                                    <path d="M16 3v5"/>
+                                </svg>
+                            </div>
+                            <div class="w-8 h-8 text-white flex items-center justify-center font-bold" style="background: linear-gradient(to right, #012F6D, #034490);">
+                                ■
+                            </div>
+                            <div class="text-gray-500">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                    <circle cx="12" cy="7" r="4"/>
+                                </svg>
+                            </div>
+                        </div>
 
-      {/* Main Content */}
-      <div className="flex-1 overflow-y-auto">
-        {/* Top Navigation */}
-        <div className="flex justify-between items-center p-4">
-          <div className="flex gap-4 text-gray-500">
-            <MessageIcon />
-            <CalendarIcon />
-          </div>
-          <div className="w-8 h-8 text-white flex items-center justify-center border-radius-1 font-bold" style={{background: 'linear-gradient(to right, #012F6D, #034490)'}}>
-            ■
-          </div>
-          <div className="text-gray-500">
-            <UserIcon />
-          </div>
-        </div>
+                        <!-- Quick Actions -->
+                        <div class="flex gap-4 px-5 pb-5 overflow-x-auto">
+                            <div class="flex flex-col items-center min-w-fit">
+                                <div class="w-12 h-12 bg-gray-100 border border-gray-300 rounded-lg flex items-center justify-center text-blue-600 mb-1">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="12" y1="5" x2="12" y2="19"/>
+                                        <line x1="5" y1="12" x2="19" y2="12"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="flex flex-col items-center min-w-fit">
+                                <div class="w-12 h-12 bg-gray-100 border border-gray-300 rounded-lg flex items-center justify-center text-blue-600 mb-1">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="7" y1="17" x2="17" y2="7"/>
+                                        <polyline points="7,7 17,7 17,17"/>
+                                    </svg>
+                                </div>
+                                <div class="text-xs text-blue-600 text-center">Send | Zelle®</div>
+                            </div>
+                            <div class="flex flex-col items-center min-w-fit">
+                                <div class="w-12 h-12 bg-gray-100 border border-gray-300 rounded-lg flex items-center justify-center text-blue-600 mb-1">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                        <polyline points="14,2 14,8 20,8"/>
+                                        <line x1="16" y1="13" x2="8" y2="13"/>
+                                        <line x1="16" y1="17" x2="8" y2="17"/>
+                                        <polyline points="10,9 9,9 8,9"/>
+                                    </svg>
+                                </div>
+                                <div class="text-xs text-blue-600 text-center">Deposit checks</div>
+                            </div>
+                            <div class="flex flex-col items-center min-w-fit">
+                                <div class="w-12 h-12 bg-gray-100 border border-gray-300 rounded-lg flex items-center justify-center text-blue-600 mb-1">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                                        <line x1="1" y1="10" x2="23" y2="10"/>
+                                    </svg>
+                                </div>
+                                <div class="text-xs text-blue-600 text-center">Pay bills</div>
+                            </div>
+                        </div>
 
-        {/* Quick Actions */}
-        <div className="flex gap-4 px-5 pb-5 overflow-x-auto">
-          <div className="flex flex-col items-center min-w-fit">
-            <div className="w-12 h-12 bg-gray-100 border border-gray-300 rounded-lg flex items-center justify-center text-blue-600 mb-1">
-              <PlusIcon />
-            </div>
-          </div>
-          <div className="flex flex-col items-center min-w-fit">
-            <div className="w-12 h-12 bg-gray-100 border border-gray-300 rounded-lg flex items-center justify-center text-blue-600 mb-1">
-              <SendIcon />
-            </div>
-            <div className="text-xs text-blue-600 text-center">Send | Zelle®</div>
-          </div>
-          <div className="flex flex-col items-center min-w-fit">
-            <div className="w-12 h-12 bg-gray-100 border border-gray-300 rounded-lg flex items-center justify-center text-blue-600 mb-1">
-              <DocumentIcon />
-            </div>
-            <div className="text-xs text-blue-600 text-center">Deposit checks</div>
-          </div>
-          <div className="flex flex-col items-center min-w-fit">
-            <div className="w-12 h-12 bg-gray-100 border border-gray-300 rounded-lg flex items-center justify-center text-blue-600 mb-1">
-              <CardIcon />
-            </div>
-            <div className="text-xs text-blue-600 text-center">Pay bills</div>
-          </div>
-        </div>
+                        <!-- Accounts Section -->
+                        <div class="px-5">
+                            <div class="flex justify-between items-center mb-4">
+                                <h2 class="text-2xl font-semibold">Accounts</h2>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="1"/>
+                                    <circle cx="19" cy="12" r="1"/>
+                                    <circle cx="5" cy="12" r="1"/>
+                                </svg>
+                            </div>
 
-        {/* Accounts Section */}
-        <div className="px-5">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-semibold">Accounts</h2>
-            <MoreIcon />
-          </div>
+                            <!-- Bank Accounts -->
+                            <div class="mb-5 rounded-xl overflow-hidden shadow-sm">
+                                <div class="text-white p-4 font-medium" style="background: linear-gradient(to right, #012F6D, #034490);">
+                                    Bank accounts (3)
+                                </div>
+                                
+                                <button onclick="openDetail('college')" class="w-full bg-white border-b border-gray-100 p-5 flex justify-between items-center text-left">
+                                    <div class="flex-1">
+                                        <div class="text-base mb-1">CHASE COLLEGE (...9238)</div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-lg font-semibold mb-0.5">${formatMoney(state.accounts.college.balance)}</div>
+                                        <div class="text-xs text-gray-500">Available balance</div>
+                                    </div>
+                                    <div class="ml-2">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#c7c7cc" stroke-width="2">
+                                            <polyline points="9,18 15,12 9,6"/>
+                                        </svg>
+                                    </div>
+                                </button>
 
-          {/* Bank Accounts */}
-          <div className="mb-5 rounded-xl overflow-hidden shadow-sm">
-            <div className="bg-blue-600 text-white p-4 font-medium">
-              Bank accounts (3)
-            </div>
-            
-            <button
-              onClick={() => openDetail('college')}
-              className="w-full bg-white border-b border-gray-100 p-5 flex justify-between items-center text-left"
-            >
-              <div className="flex-1">
-                <div className="text-base mb-1">CHASE COLLEGE (...9238)</div>
-              </div>
-              <div className="text-right">
-                <div className="text-lg font-semibold mb-0.5">{formatMoney(accounts.college.balance)}</div>
-                <div className="text-xs text-gray-500">Available balance</div>
-              </div>
-              <div className="ml-2">
-                <ChevronIcon />
-              </div>
-            </button>
+                                <button onclick="openDetail('checking')" class="w-full bg-white border-b border-gray-100 p-5 flex justify-between items-center text-left">
+                                    <div class="flex-1">
+                                        <div class="text-base mb-1">TOTAL CHECKING (...2107)</div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-lg font-semibold mb-0.5">${formatMoney(state.accounts.checking.balance)}</div>
+                                        <div class="text-xs text-gray-500">Available balance</div>
+                                    </div>
+                                    <div class="ml-2">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#c7c7cc" stroke-width="2">
+                                            <polyline points="9,18 15,12 9,6"/>
+                                        </svg>
+                                    </div>
+                                </button>
 
-            <button
-              onClick={() => openDetail('checking')}
-              className="w-full bg-white border-b border-gray-100 p-5 flex justify-between items-center text-left"
-            >
-              <div className="flex-1">
-                <div className="text-base mb-1">TOTAL CHECKING (...2107)</div>
-              </div>
-              <div className="text-right">
-                <div className="text-lg font-semibold mb-0.5">{formatMoney(accounts.checking.balance)}</div>
-                <div className="text-xs text-gray-500">Available balance</div>
-              </div>
-              <div className="ml-2">
-                <ChevronIcon />
-              </div>
-            </button>
+                                <button onclick="openDetail('savings')" class="w-full bg-white p-5 flex justify-between items-center text-left">
+                                    <div class="flex-1">
+                                        <div class="text-base mb-1">CHASE SAVINGS (...8004)</div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-lg font-semibold mb-0.5">${formatMoney(state.accounts.savings.balance)}</div>
+                                        <div class="text-xs text-gray-500">Available balance</div>
+                                    </div>
+                                    <div class="ml-2">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#c7c7cc" stroke-width="2">
+                                            <polyline points="9,18 15,12 9,6"/>
+                                        </svg>
+                                    </div>
+                                </button>
+                            </div>
 
-            <button
-              onClick={() => openDetail('savings')}
-              className="w-full bg-white p-5 flex justify-between items-center text-left"
-            >
-              <div className="flex-1">
-                <div className="text-base mb-1">CHASE SAVINGS (...8004)</div>
-              </div>
-              <div className="text-right">
-                <div className="text-lg font-semibold mb-0.5">{formatMoney(accounts.savings.balance)}</div>
-                <div className="text-xs text-gray-500">Available balance</div>
-              </div>
-              <div className="ml-2">
-                <ChevronIcon />
-              </div>
-            </button>
-          </div>
+                            <!-- Credit Cards -->
+                            <div class="mb-5 rounded-xl overflow-hidden shadow-sm">
+                                <div class="text-white p-4 font-medium" style="background: linear-gradient(to right, #012F6D, #034490);">
+                                    Credit cards (1)
+                                </div>
+                                
+                                <button onclick="openDetail('credit')" class="w-full bg-white p-5 flex justify-between items-center text-left">
+                                    <div class="flex-1">
+                                        <div class="text-base mb-1">Freedom Unlimited (...6628)</div>
+                                        <div class="w-10 h-6 rounded mt-1 flex items-center justify-center text-white text-xs font-bold" style="background: linear-gradient(to right, #012F6D, #034490);">
+                                            FREEDOM
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-lg font-semibold mb-0.5">${formatMoney(state.accounts.credit.balance)}</div>
+                                        <div class="text-xs text-gray-500">Available balance</div>
+                                    </div>
+                                    <div class="ml-2">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#c7c7cc" stroke-width="2">
+                                            <polyline points="9,18 15,12 9,6"/>
+                                        </svg>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
 
-          {/* Credit Cards */}
-          <div className="mb-5 rounded-xl overflow-hidden shadow-sm">
-            <div className="bg-blue-600 text-white p-4 font-medium">
-              Credit cards (1)
-            </div>
-            
-            <button
-              onClick={() => openDetail('credit')}
-              className="w-full bg-white p-5 flex justify-between items-center text-left"
-            >
-              <div className="flex-1">
-                <div className="text-base mb-1">Freedom Unlimited (...6628)</div>
-                <div className="w-10 h-6 rounded mt-1 flex items-center justify-center text-white text-xs font-bold" style={{background: 'linear-gradient(to right, #012F6D, #034490)'}}>
-                  FREEDOM
+                    <!-- Bottom Navigation -->
+                    <div class="flex justify-around p-2 pt-2 pb-8 bg-gray-100 border-t border-gray-300">
+                        <div class="flex flex-col items-center gap-1 flex-1 text-blue-600">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                                <polyline points="9,22 9,12 15,12 15,22"/>
+                            </svg>
+                            <div class="text-xs">Accounts</div>
+                        </div>
+                        <div class="flex flex-col items-center gap-1 flex-1 text-gray-500">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="1" x2="12" y2="23"/>
+                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                            </svg>
+                            <div class="text-xs">Pay & transfer</div>
+                        </div>
+                        <div class="flex flex-col items-center gap-1 flex-1 text-gray-500">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="20" x2="18" y2="10"/>
+                                <line x1="12" y1="20" x2="12" y2="4"/>
+                                <line x1="6" y1="20" x2="6" y2="14"/>
+                            </svg>
+                            <div class="text-xs">Plan & track</div>
+                        </div>
+                        <div class="flex flex-col items-center gap-1 flex-1 text-gray-500">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+                            </svg>
+                            <div class="text-xs">Benefits & travel</div>
+                        </div>
+                        <div class="flex flex-col items-center gap-1 flex-1 text-gray-500">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="3" y1="6" x2="21" y2="6"/>
+                                <line x1="3" y1="12" x2="21" y2="12"/>
+                                <line x1="3" y1="18" x2="21" y2="18"/>
+                            </svg>
+                            <div class="text-xs">More</div>
+                        </div>
+                    </div>
                 </div>
-              </div>
-              <div className="text-right">
-                <div className="text-lg font-semibold mb-0.5">{formatMoney(accounts.credit.balance)}</div>
-                <div className="text-xs text-gray-500">Available balance</div>
-              </div>
-              <div className="ml-2">
-                <ChevronIcon />
-              </div>
-            </button>
-          </div>
-        </div>
-      </div>
+            `;
+        }
 
-      {/* Bottom Navigation */}
-      <div className="flex justify-around p-2 pt-2 pb-8 bg-gray-100 border-t border-gray-300">
-        <div className="flex flex-col items-center gap-1 flex-1 text-blue-600">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-            <polyline points="9,22 9,12 15,12 15,22"/>
-          </svg>
-          <div className="text-xs">Accounts</div>
-        </div>
-        <div className="flex flex-col items-center gap-1 flex-1 text-gray-500">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <line x1="12" y1="1" x2="12" y2="23"/>
-            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-          </svg>
-          <div className="text-xs">Pay & transfer</div>
-        </div>
-        <div className="flex flex-col items-center gap-1 flex-1 text-gray-500">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <line x1="18" y1="20" x2="18" y2="10"/>
-            <line x1="12" y1="20" x2="12" y2="4"/>
-            <line x1="6" y1="20" x2="6" y2="14"/>
-          </svg>
-          <div className="text-xs">Plan & track</div>
-        </div>
-        <div className="flex flex-col items-center gap-1 flex-1 text-gray-500">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
-          </svg>
-          <div className="text-xs">Benefits & travel</div>
-        </div>
-        <div className="flex flex-col items-center gap-1 flex-1 text-gray-500">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <line x1="3" y1="6" x2="21" y2="6"/>
-            <line x1="3" y1="12" x2="21" y2="12"/>
-            <line x1="3" y1="18" x2="21" y2="18"/>
-          </svg>
-          <div className="text-xs">More</div>
-        </div>
-      </div>
-    </div>
-  );
-};
+        function render() {
+            const app = document.getElementById('app');
+            if (state.currentView === 'detail' && state.currentAccount) {
+                app.innerHTML = renderDetailView();
+            } else {
+                app.innerHTML = renderMainView();
+            }
+        }
 
-export default ChaseApp;
+        // Initialize app
+        updateTime();
+        setInterval(updateTime, 60000); // Update every minute
+        render();
+
+        // Prevent zoom on double tap
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+
+        // Service Worker for PWA functionality
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('data:text/javascript;base64,c2VsZi5hZGRFdmVudExpc3RlbmVyKCdpbnN0YWxsJywgZXZlbnQgPT4gewogIGNvbnNvbGUubG9nKCdTVyBpbnN0YWxsZWQnKTsKfSk7CgpzZWxmLmFkZEV2ZW50TGlzdGVuZXIoJ2ZldGNoJywgZXZlbnQgPT4gewogIGV2ZW50LnJlc3BvbmRXaXRoKGZldGNoKGV2ZW50LnJlcXVlc3QpKTsKfSk7')
+                .then(() => console.log('SW registered'))
+                .catch(() => console.log('SW registration failed'));
+        }
+    </script>
+</body>
+</html>
